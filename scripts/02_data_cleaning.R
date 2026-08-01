@@ -6,33 +6,28 @@
 
 library(tidyverse)
 
+# Import data from Script 01
 source("scripts/01_import_data.R")
 
+# Replace "Pending" with proper missing values
 clean_final_data <- final_data |>
   mutate(
-    Value = if_else(
+    Value_Clean = if_else(
       Value == "Pending",
       NA_character_,
       Value
     )
   )
 
-count(clean_final_data, Value, sort = TRUE)
-
-
-final_data |>
-  count(Value) |>
-  filter(grepl("nil", Value, ignore.case = TRUE))
-final_data |>
-  count(Value, sort = TRUE) |>
-  print(n = 100)
-
-final_data |>
+# Create an analysis-ready numeric column
+clean_final_data <- clean_final_data |>
   mutate(
-    Numeric_Value = suppressWarnings(as.numeric(Value))
-  ) |>
-  filter(is.na(Numeric_Value) & !is.na(Value)) |>
-  distinct(Value)
+    Value_Numeric = suppressWarnings(
+      as.numeric(Value_Clean)
+    )
+  )
 
+# Validate the cleaned data
+glimpse(clean_final_data)
 
-
+summary(clean_final_data$Value_Numeric)
